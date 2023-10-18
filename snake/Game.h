@@ -3,30 +3,28 @@
 #include "Grid.h"
 #include "Player.h"
 
-enum gameMode
-{
-	menu,
-	game,
-	score
-};
-
 class Game
 {
 public:
-	Game(sf::RenderWindow* window);
+	Game(sf::RenderWindow* window, sf::Font* font);
 	~Game();
-	gameMode run();
-	void handleEvents();
+	bool run();
+	bool handleEvents();
 	void updateGameState();
 	void drawGameState();
 private:
-	double dt;								// [TIME] Defining the delta-time
-	sf::Clock clock;						// [TIME] Defining the clock object
+	double dt;												// [TIME] Defining the delta-time
+	sf::Clock clock;										// [TIME] Defining the clock object
 	sf::RenderWindow* window;
-	bool isRunning, toMenu;
+	bool isRunning;
 	Grid* grid;
 	Player* snake;
 
-	// variables for when the player dies
-	sf::RectangleShape displayBoard;
+	// [GRAPHICS] for visuals
+	sf::RectangleShape displayWindow;
+	sf::Text scoreText;
+	std::string score;
+	sf::Text GmOvrText;
+	sf::Text infoText;
+	// [GRAPHICS] end
 };

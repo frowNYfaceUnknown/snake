@@ -1,6 +1,6 @@
-#include "Grid.h"
 #include <random>
 #include <chrono>
+#include "Grid.h"
 
 Grid::Grid() {}
 
@@ -9,19 +9,20 @@ Grid::Grid(sf::Vector2f gridSize)
 	this->gridSize = gridSize;
 	generateFood();
 
-	// for visuals
-	offset = sf::Vector2f(55, 22.5);		// in pixels
-	tileSize = 45;							// in pixels
+	// [GRAPHICS] for visuals
+	offset = sf::Vector2f(55, 40);							// in pixels
+	tileSize = 45;											// in pixels
 
 	tile.setSize(sf::Vector2f(tileSize, tileSize));
-	tile.setFillColor(sf::Color(249, 167, 62));
+	tile.setFillColor(sf::Color(72, 58, 171));
 	tile.setOutlineThickness(-2.5f);
-	tile.setOutlineColor(sf::Color(246, 253, 195));
+	tile.setOutlineColor(sf::Color(91, 78, 180));
 
 	food_tile.setSize(sf::Vector2f(tileSize, tileSize));
-	food_tile.setFillColor(sf::Color(191, 33, 47));
+	food_tile.setFillColor(sf::Color(182, 90, 120));
 	food_tile.setOutlineThickness(-2.5f);
-	food_tile.setOutlineColor(sf::Color(246, 253, 195));
+	food_tile.setOutlineColor(sf::Color(91, 78, 180));
+	// [GRAPHICS] end
 }
 
 sf::Vector2f Grid::getSize()

@@ -9,11 +9,12 @@ Player::Player(Grid* grid, sf::Vector2f pos)
 	currDir = sf::Vector2f(1, 0);
 	speed = 5;												// tiles per second
 
-	// for visuals
+	// [GRAPHICS] for visuals
 	snake_tile.setSize(sf::Vector2f(grid->getTileSize(), grid->getTileSize()));
-	snake_tile.setFillColor(sf::Color(39, 179, 118));
+	snake_tile.setFillColor(sf::Color(90, 182, 152));		// 39, 179, 118
 	snake_tile.setOutlineThickness(-2.5f);
-	snake_tile.setOutlineColor(sf::Color(246, 253, 195));
+	snake_tile.setOutlineColor(sf::Color(91, 78, 180));
+	// [GRAPHICS] end
 }
 
 void Player::move()
@@ -40,6 +41,7 @@ void Player::move()
 		if (body.front() == grid->getFoodPos())				// [GROW] appends it only if the snake ate the food
 		{
 			body.push_back(bodyEnd);
+			length++;
 			grid->generateFood();
 		}
 
@@ -85,4 +87,9 @@ bool Player::isAlive()
 sf::RectangleShape* Player::getTile()
 {
 	return &snake_tile;
+}
+
+int Player::getLength()
+{
+	return length;
 }

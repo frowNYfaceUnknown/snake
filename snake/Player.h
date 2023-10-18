@@ -15,6 +15,7 @@ public:
 	sf::Vector2f getPos();
 	double getSpeed();
 	sf::RectangleShape* getTile();
+	int getLength();
 private:
 	bool alive;
 	// [MOVE-TO] shift body here

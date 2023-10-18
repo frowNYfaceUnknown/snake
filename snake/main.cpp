@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include "Game.h"
-#include "Menu.h"
-#include "Score.h"
 
 int main()
 {
@@ -9,36 +8,26 @@ int main()
 	const int WIDTH = 1280, HEIGHT = 720;
 	sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Snake!");
 	window.setFramerateLimit(30);
+	// [SCREEN INIT] end
 
-	gameMode currMode = game;
-
-	switch (currMode)
+	// [FONT & TEXT] load font
+	sf::Font font;
+	if (!font.loadFromFile("QuinqueFive.ttf"))
 	{
-	case menu:
-	{
-		Menu *mainMenu = new Menu(&window);
-		mainMenu->run();
-		delete mainMenu;
-		break;
+		std::cout << "Font File not found." << std::endl;
+		return -1;
 	}
-	case game:
+	// [FONT & TEXT] end
+
+	bool gameOver = false;
+	while (!gameOver)
 	{
-		Game *mainGame = new Game(&window);
-		currMode = mainGame->run();
+		// [GAME] create, run and destroy main game
+		Game *mainGame = new Game(&window, &font);
+		gameOver = mainGame->run();
 		delete mainGame;
-		break;
+		// [GAME] end
 	}
-	case score:
-	{
-		Score *playerScore = new Score(&window);
-		playerScore->run();
-		delete playerScore;
-		break;
-	}
-	default:
-		break;
-	}
-
 
 	return 0;
 }

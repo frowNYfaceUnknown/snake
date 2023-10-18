@@ -1,20 +1,43 @@
-#include <iostream>
+#include <string.h>
+#include <iostream>											// DEBUG ONLY
 #include "Game.h"
 
-Game::Game(sf::RenderWindow* window)
+Game::Game(sf::RenderWindow* window, sf::Font* font)
 {
 	this->window = window;
 	isRunning = true;
-	toMenu = false;
-	grid = new Grid(sf::Vector2f(26, 15));				// ~same ratio as 1280 x 720
+	dt = 0;
+	grid = new Grid(sf::Vector2f(26, 15));					// ~same ratio as 1280 x 720
 	snake = new Player(grid, sf::Vector2f(0, 0));
 
-	// display when the player dies
-	displayBoard.setSize(sf::Vector2f(window->getSize().x / 2, window->getSize().y / 2));
-	displayBoard.setFillColor(sf::Color(0, 111, 60));
-	displayBoard.setPosition(sf::Vector2f((window->getSize().x / 2) - (displayBoard.getSize().x / 2), (window->getSize().y / 2) - (displayBoard.getSize().y / 2)));
-	displayBoard.setOutlineColor(sf::Color(38, 75, 150));
-	displayBoard.setOutlineThickness(20);
+	// [GRAPHICS] for visuals
+	score = "SCORE:";
+	const int OFFSET = 80;
+
+	displayWindow.setSize(sf::Vector2f(window->getSize().x / 2, window->getSize().y / 2));
+	displayWindow.setPosition(sf::Vector2f(window->getSize().x / 2 - displayWindow.getSize().x / 2, window->getSize().y / 2 - displayWindow.getSize().y / 2));
+	displayWindow.setFillColor(sf::Color(72, 58, 171));
+	displayWindow.setOutlineColor(sf::Color(91, 78, 180));
+	displayWindow.setOutlineThickness(20);
+
+	scoreText.setFont(*font);
+	scoreText.setPosition(sf::Vector2f(window->getSize().x / 2 - scoreText.getGlobalBounds().width / 2, 5));
+	scoreText.setFillColor(sf::Color::White);
+	scoreText.setCharacterSize(24);
+	
+	GmOvrText.setFont(*font);
+	GmOvrText.setFillColor(sf::Color::White);
+	GmOvrText.setCharacterSize(48);
+	GmOvrText.setString("Game Over!");
+	GmOvrText.setPosition(sf::Vector2f(window->getSize().x / 2 - GmOvrText.getGlobalBounds().width / 2, window->getSize().y / 2 - GmOvrText.getGlobalBounds().height / 2 - OFFSET));
+	
+	infoText.setFont(*font);
+	infoText.setFillColor(sf::Color::White);
+	infoText.setCharacterSize(24);
+	infoText.setLineSpacing(2);
+	infoText.setString("Press [SPACE]\nto play again!");
+	infoText.setPosition(sf::Vector2f(window->getSize().x / 2 - infoText.getGlobalBounds().width / 2, window->getSize().y / 2 - infoText.getGlobalBounds().height / 2 + OFFSET));
+	// [GRAPHICS] end
 }
 
 Game::~Game()
@@ -23,15 +46,15 @@ Game::~Game()
 	delete grid;
 }
 
-gameMode Game::run()
+bool Game::run()
 {
-	// [TIME] resetting the clock for frame-independent speeds
-	clock.restart();
+	clock.restart();										// [TIME] resetting the clock for frame-independent speeds
 
 	// [GAME-LOOP] main game loop
+	bool gameOver = false;
 	while (isRunning)
 	{
-		handleEvents();										// [GAME] handle SFML events
+		gameOver = handleEvents();							// [GAME] handle SFML events
 
 		updateGameState();									// [GAME] update sprites, logic, etc.
 
@@ -39,22 +62,25 @@ gameMode Game::run()
 
 		window->display();									// [GAME] updates the frame and copies buffer onto the screen
 	}
+	// [GAME-LOOP] end
 
-	if (toMenu) return menu;
-	else return score;
+	return gameOver;
 }
 
-void Game::handleEvents()
+bool Game::handleEvents()
 {
 	sf::Event event;
 	while (window->pollEvent(event))
 	{
 		if (event.type == sf::Event::KeyPressed)
 		{
+			if (!snake->isAlive() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+				isRunning = false;
+
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			{
 				isRunning = false;
-				toMenu = true;
+				return true;
 			}
 
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -70,21 +96,29 @@ void Game::handleEvents()
 				snake->changeDir(sf::Vector2f(0, 1));
 		}
 	}
+
+	return false;
 }
 
 void Game::updateGameState()
 {
-	dt = clock.getElapsedTime().asSeconds();			// [TIME] calc delta-time
+	dt = clock.getElapsedTime().asSeconds();				// [TIME] calc delta-time
 	if (dt >= 1/snake->getSpeed())
 	{
 		snake->move();
 		clock.restart();
 	}
+
+	std::string temp = score + std::to_string(snake->getLength() - 1);
+	scoreText.setString(temp);
 }
 
 void Game::drawGameState()
 {
-	window->clear(sf::Color(sf::Color(246, 253, 195)));
+	window->clear(sf::Color(72, 58, 171));
+	
+	scoreText.setPosition(sf::Vector2f(window->getSize().x / 2 - scoreText.getGlobalBounds().width / 2, 5));
+	window->draw(scoreText);
 
 	for (int x = 0; x < grid->getSize().x; x++)
 	{
@@ -106,6 +140,8 @@ void Game::drawGameState()
 
 	if (!snake->isAlive())
 	{
-		window->draw(displayBoard);
+		window->draw(displayWindow);
+		window->draw(GmOvrText);
+		window->draw(infoText);
 	}
 }
